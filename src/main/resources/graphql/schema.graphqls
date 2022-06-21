@@ -1,0 +1,19 @@
+type Query {
+    recipe(id: ID): Recipe
+    recipes: [Recipe]
+}
+
+type Mutation {
+    addRecipe(id: ID, description: String): Recipe
+}
+
+type Recipe {
+    id: ID!,
+    description: String!,
+    prepTime: Int,
+    cookTime: Int,
+    servings: Int,
+    source: String,
+    url: String,
+    notes: String
+}
