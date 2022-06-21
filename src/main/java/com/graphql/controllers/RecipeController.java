@@ -3,6 +3,7 @@ package com.graphql.controllers;
 import com.graphql.domain.Recipe;
 import com.graphql.repositories.RecipeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
@@ -19,7 +20,7 @@ public class RecipeController {
 
     @QueryMapping("recipe")
 //    @SchemaMapping(typeName = "Query", field = "recipe")
-    public Mono<Recipe> recipe(String id) {
+    public Mono<Recipe> recipe(@Argument String id) {
         return recipeRepository.findById(id);
     }
 
@@ -29,7 +30,7 @@ public class RecipeController {
     }
 
     @MutationMapping("addRecipe")
-    public Mono<Recipe> addRecipe(@RequestBody String description) {
+    public Mono<Recipe> addRecipe(@Argument String description) {
         return recipeRepository.save(new Recipe(UUID.randomUUID().toString(), description));
     }
 }

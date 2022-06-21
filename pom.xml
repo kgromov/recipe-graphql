@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.graphql</groupId>
-    <artifactId>graphql</artifactId>
+    <artifactId>recipe-graphql</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>graphql</name>
     <description>Demo project for GraphQL with Spring Boot</description>
