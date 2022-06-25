@@ -1,15 +1,14 @@
 package com.graphql.domain;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Document
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"id"})
 public class Recipe {
@@ -22,10 +21,10 @@ public class Recipe {
     private String source;
     private String url;
     private String notes;
-   /* private Set<Ingredient> ingredients = new HashSet<>();
+    private Set<Ingredient> ingredients = new HashSet<>();
     private Byte[] image;
     private Difficulty difficulty;
-    private Set<Category> categories = new HashSet<>();*/
+    private Category category;
 
     public Recipe(String description) {
         this.description = description;
@@ -36,8 +35,8 @@ public class Recipe {
         this.description = description;
     }
 
-    /*public Recipe addIngredient(Ingredient ingredient){
+    public Recipe addIngredient(Ingredient ingredient){
         this.ingredients.add(ingredient);
         return this;
-    }*/
+    }
 }
