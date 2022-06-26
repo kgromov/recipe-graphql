@@ -23,7 +23,7 @@ public class RecipeDto {
     private String url;
     private String notes;
     private Difficulty difficulty;
-    private String categoryId;
+//    private String categoryId;
 
     public RecipeDto(Recipe recipe) {
         this.id = recipe.getId();
@@ -35,6 +35,6 @@ public class RecipeDto {
         this.prepTime = Optional.ofNullable(recipe.getPrepTime()).orElse(0);
         this.cookTime = Optional.ofNullable(recipe.getCookTime()).orElse(0);
         this.servings = Optional.ofNullable(recipe.getServings()).orElse(0);
-        this.categoryId = recipe.getCategory().getId();
+//        this.categoryId = recipe.getCategory().getId();
     }
 }

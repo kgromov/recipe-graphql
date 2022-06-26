@@ -5,14 +5,20 @@ type Query {
     categories: [Category]
 }
 
-type Category {
-    id: ID!,
-    description: String!
-}
-
 type Mutation {
     addRecipe(description: String): Recipe
     addRecipeWithPayload(recipeDto: RecipeDto): Recipe
+    addCategory(name: String): Category
+}
+
+type Subscription {
+    recipes: [Recipe]
+}
+
+type Category {
+    id: ID!,
+    name: String!
+#    recipes: [Recipe]
 }
 
 type Recipe {
@@ -23,9 +29,9 @@ type Recipe {
     servings: Int,
     source: String,
     url: String,
-    notes: String
+    notes: String,
     difficulty: Difficulty,
-    category: Category
+#    category: Category
 }
 
 input RecipeDto {
@@ -35,8 +41,9 @@ input RecipeDto {
     servings: Int,
     source: String,
     url: String,
-    notes: String
-    difficulty: Difficulty
+    notes: String,
+    difficulty: Difficulty,
+    categoryId: String
 }
 
 enum Difficulty {
