@@ -22,21 +22,22 @@ public class GraphqlClientsApplication {
     }
 
     @Bean
-    ApplicationRunner applicationRunner(HttpGraphQlClient httpGraphQlClient,
-                                        RSocketGraphQlClient rSocketGraphQlClient) {
+    ApplicationRunner applicationRunner(HttpGraphQlClient http,
+                                        RSocketGraphQlClient rsocket) {
         return args -> {
-            String httpRequestDocument = "query {recipes {id, description}}";
-            Flux.concat(httpGraphQlClient.document(httpRequestDocument)
-                    .retrieve("recipes")
+            String httpRequestDocument = "query {getRecipes {id, description}}";
+            Flux.concat(http.document(httpRequestDocument)
+                    .retrieve("getRecipes")
                     .toEntityList(new ParameterizedTypeReference<RecipeDto>() {
                     }))
-                    .subscribe(recipe -> log.info("{}", recipe));
+                    .subscribe(recipe -> log.info("http client received: {}", recipe));
+
             String rsocketRequestDocument = "subscription {recipes {id, description}}";
-            rSocketGraphQlClient.document(rsocketRequestDocument)
+            rsocket.document(rsocketRequestDocument)
                     .retrieveSubscription("recipes")
                     .toEntity(RecipeDto.class)
                     .delayElements(Duration.ofMillis(500))
-                    .subscribe(recipe -> log.info("{}", recipe));
+                    .subscribe(recipe -> log.info("http client received: {}", recipe));
             ;
         };
     }

@@ -10,11 +10,11 @@ public class RecipeClient {
 
     @Bean
     public HttpGraphQlClient httpGraphQlClient() {
-        return HttpGraphQlClient.builder().url("http://localhost:8080/graphiql").build();
+        return HttpGraphQlClient.builder().url("http://localhost:8080/graphql").build();
     }
 
     @Bean
     public RSocketGraphQlClient rSocketGraphQlClient() {
-        return RSocketGraphQlClient.builder().tcp("localhost", 9191).route("graphiql").build();
+        return RSocketGraphQlClient.builder().tcp("localhost", 9191).route("graphql").build();
     }
 }
