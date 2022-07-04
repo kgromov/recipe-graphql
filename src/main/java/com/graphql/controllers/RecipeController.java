@@ -38,9 +38,16 @@ public class RecipeController {
         return recipeRepository.findAll();
     }
 
+    @QueryMapping("categories")
+    public Flux<Category> categories() {
+        return categoryRepository.findAll();
+    }
+
     @SchemaMapping(typeName = "Category")
-    public Mono<Category> category(@Argument String id) {
-        return categoryRepository.findById(id);
+    public Flux<Recipe> recipes(@Argument Category category) {
+        log.info("Fetching recipes for category {}", category);
+        return categoryRepository.findById(category.getId())
+                .flatMapIterable(Category::getRecipes);
     }
 
    /* @BatchMapping

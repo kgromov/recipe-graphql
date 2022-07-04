@@ -1,5 +1,6 @@
 package com.graphql.domain.dtos;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.graphql.domain.Difficulty;
 import com.graphql.domain.Recipe;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RecipeDto {
     private String id;
     private String description;
@@ -23,7 +25,7 @@ public class RecipeDto {
     private String url;
     private String notes;
     private Difficulty difficulty;
-//    private String categoryId;
+    private String categoryId;
 
     public RecipeDto(Recipe recipe) {
         this.id = recipe.getId();
@@ -35,6 +37,6 @@ public class RecipeDto {
         this.prepTime = Optional.ofNullable(recipe.getPrepTime()).orElse(0);
         this.cookTime = Optional.ofNullable(recipe.getCookTime()).orElse(0);
         this.servings = Optional.ofNullable(recipe.getServings()).orElse(0);
-//        this.categoryId = recipe.getCategory().getId();
+        this.categoryId = recipe.getCategory().getId();
     }
 }

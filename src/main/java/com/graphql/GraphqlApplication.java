@@ -1,7 +1,9 @@
 package com.graphql;
 
+import com.graphql.domain.Category;
 import com.graphql.domain.Recipe;
 import com.graphql.domain.dtos.RecipeDto;
+import com.graphql.repositories.CategoryRepository;
 import com.graphql.repositories.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -16,9 +18,7 @@ import org.springframework.graphql.client.RSocketGraphQlClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 @Slf4j
@@ -31,34 +31,33 @@ public class GraphqlApplication {
     }
 
     @Bean
-    ApplicationRunner applicationRunner(RecipeRepository recipeRepository) {
+    ApplicationRunner applicationRunner(CategoryRepository categoryRepository,
+                                        RecipeRepository recipeRepository) {
         return args -> {
-            recipeRepository.deleteAll()
+            Flux<String> slowFood = Flux.just("Borsch", "Pasta");
+            Flux<String> fastFood = Flux.just("Pizza", "Sushi", "Hot-Dog", "Hamburger");
+            categoryRepository.deleteAll()
                     .thenMany(
-                            Flux.just("Perfect Guacamole", "Pizza")
-                                    .map(name -> new Recipe(UUID.randomUUID().toString(), name))
-                                    .flatMap(recipeRepository::save)
-                    )
-                    .thenMany(recipeRepository.findAll())
-                    .subscribe(recipe -> log.info("saving {}", recipe));
+                            Flux.just("Fast food", "Slow food")
+//                                    .map(name -> new Category(UUID.randomUUID().toString(), name))
+                                    .map(name -> new Category(null, name))
+                                    .flatMap(categoryRepository::save)
+                    ).subscribe(category -> {
+                        recipeRepository.deleteAll()
+                                .thenMany(
+                                        (category.getName().startsWith("Slow") ? slowFood : fastFood)
+                                                .map(name -> new Recipe(UUID.randomUUID().toString(), name, category))
+                                                /*.map(name -> {
+                                                    Recipe recipe = new Recipe(UUID.randomUUID().toString(), name);
+                                                    category.addRecipe(recipe);
+                                                    return recipe;
+                                                })*/
+                                                .flatMap(recipeRepository::save)
+                                )
+                                .thenMany(recipeRepository.findAll())
+                                .subscribe(recipe -> log.info("saved {}", recipe));
+                    }
+            );
         };
     }
-
-    /*@Bean
-    ApplicationRunner applicationRunner(HttpGraphQlClient httpGraphQlClient,
-                                        RSocketGraphQlClient rSocketGraphQlClient) {
-        return args -> {
-            String httpRequestDocument = "query {recipes {id, description}}";
-            Flux.concat(httpGraphQlClient.document(httpRequestDocument)
-                    .retrieve("recipes")
-                    .toEntityList(new ParameterizedTypeReference<RecipeDto>() {}))
-                    .subscribe(recipe -> log.info("{}", recipe));
-
-            String rsocketRequestDocument = "subscription {recipes {id, description}}";
-            rSocketGraphQlClient.document(rsocketRequestDocument)
-                    .retrieveSubscription("recipes")
-                    .toEntity(RecipeDto.class)
-                    .subscribe(recipe -> log.info("{}", recipe));
-;            };
-    }*/
 }

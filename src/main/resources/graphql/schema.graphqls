@@ -1,5 +1,5 @@
 type Query {
-    recipe(id: ID): Recipe
+#    recipe(id: ID): Recipe
     recipes: [Recipe]
     category(id: ID): Category
     categories: [Category]
@@ -11,14 +11,10 @@ type Mutation {
     addCategory(name: String): Category
 }
 
-type Subscription {
-    recipes: [Recipe]
-}
-
 type Category {
     id: ID!,
     name: String!
-#    recipes: [Recipe]
+    recipes: [Recipe]
 }
 
 type Recipe {
@@ -31,7 +27,7 @@ type Recipe {
     url: String,
     notes: String,
     difficulty: Difficulty,
-#    category: Category
+    category: Category
 }
 
 input RecipeDto {
