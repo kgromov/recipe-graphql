@@ -24,7 +24,7 @@ public class Recipe {
     private Set<Ingredient> ingredients = new HashSet<>();
     private Byte[] image;
     private Difficulty difficulty;
-    private Category category;
+    private String categoryId;
 
     public Recipe(String description) {
         this.description = description;
@@ -38,8 +38,8 @@ public class Recipe {
     public Recipe(String id, String description, Category category) {
         this.id = id;
         this.description = description;
-        this.category = category;
-//        this.category.getRecipes().add(this);
+        this.categoryId = category.getId();
+        category.getRecipes().add(this);
     }
 
     public Recipe addIngredient(Ingredient ingredient){

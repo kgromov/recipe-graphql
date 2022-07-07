@@ -37,6 +37,6 @@ public class RecipeDto {
         this.prepTime = Optional.ofNullable(recipe.getPrepTime()).orElse(0);
         this.cookTime = Optional.ofNullable(recipe.getCookTime()).orElse(0);
         this.servings = Optional.ofNullable(recipe.getServings()).orElse(0);
-        this.categoryId = recipe.getCategory().getId();
+        this.categoryId = recipe.getCategoryId();
     }
 }
