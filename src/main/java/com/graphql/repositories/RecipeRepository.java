@@ -1,12 +1,14 @@
 package com.graphql.repositories;
 
 import com.graphql.domain.Recipe;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.repository.CrudRepository;
 
-public interface RecipeRepository extends ReactiveMongoRepository<Recipe, String> {
-    Mono<Recipe> findByDescription(String description);
+import java.util.Collection;
+import java.util.Optional;
 
-    Flux<Recipe> findByCategoryId(String categoryId);
+public interface RecipeRepository extends MongoRepository<Recipe, String> {
+    Optional<Recipe> findByDescription(String description);
+
+    Collection<Recipe> findByCategoryId(String categoryId);
 }

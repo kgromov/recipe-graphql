@@ -19,7 +19,7 @@ public class Category {
     @Id
     private String id;
     private String name;
-    private List<Recipe> recipes = new ArrayList<>();
+    private List<String> recipeIds = new ArrayList<>();
 
     public Category(String id, String name) {
         this.id = id;
@@ -27,6 +27,6 @@ public class Category {
     }
 
     public void addRecipe(Recipe recipe) {
-        recipes.add(recipe);
+        recipeIds.add(recipe.getId());
     }
 }

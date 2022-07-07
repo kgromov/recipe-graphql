@@ -14,6 +14,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.graphql.client.HttpGraphQlClient;
 import org.springframework.graphql.client.RSocketGraphQlClient;
@@ -25,9 +26,10 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
-@EnableReactiveMongoRepositories
+@EnableMongoRepositories
 @SpringBootApplication
 public class GraphqlApplication {
 
@@ -40,13 +42,25 @@ public class GraphqlApplication {
                                                            RecipeRepository recipeRepository) {
         return builder -> {
             builder.type("Query",
-                    wiring -> wiring.dataFetcher("recipes", env -> recipeRepository.findAll())
+                    wiring -> wiring
+                            .dataFetcher("categories", env -> categoryRepository.findAll())
+                            .dataFetcher("category", env -> {
+                                String categoryId = env.getArgument("id");
+                                return categoryRepository.findById(categoryId);
+                            })
             );
 
-            builder.type("Category",  wiring -> wiring.dataFetcher(
+            builder.type("Category", wiring -> wiring.dataFetcher(
                     "recipes", env -> {
                         Category category = env.getSource();
                         return recipeRepository.findByCategoryId(category.getId());
+                    }
+            ));
+            // In order to return category inside recipe
+            builder.type("Recipe", wiring -> wiring.dataFetcher(
+                    "category", env -> {
+                        Recipe recipe = env.getSource();
+                        return categoryRepository.findById(recipe.getCategoryId());
                     }
             ));
         };
@@ -56,30 +70,20 @@ public class GraphqlApplication {
     ApplicationRunner applicationRunner(CategoryRepository categoryRepository,
                                         RecipeRepository recipeRepository) {
         return args -> {
-            Flux<String> slowFood = Flux.just("Borsch", "Pasta");
-            Flux<String> fastFood = Flux.just("Pizza", "Sushi", "Hot-Dog", "Hamburger");
-            categoryRepository.deleteAll()
-                    .thenMany(
-                            Flux.just("Fast food", "Slow food")
-                                    .map(name -> new Category(UUID.randomUUID().toString(), name))
-//                                    .flatMap(categoryRepository::save)
-                    ).subscribe(category -> {
-                        recipeRepository.deleteAll()
-                                .thenMany(
-                                        (category.getName().startsWith("Slow") ? slowFood : fastFood)
-                                                .map(name -> new Recipe(UUID.randomUUID().toString(), name, category))
-                                                /*.map(name -> {
-                                                    Recipe recipe = new Recipe(UUID.randomUUID().toString(), name);
-                                                    category.addRecipe(recipe);
-                                                    return recipe;
-                                                })*/
-                                                .flatMap(recipeRepository::save)
-                                )
-                                .thenMany(recipeRepository.findAll())
-                                .subscribe(recipe -> log.info("saved {}", recipe));
-                        categoryRepository.save(category).subscribe();
-                    }
+            Map<String, List<String>> recipesPerCategory = Map.of(
+                    "Fast food", List.of("Pizza", "Sushi", "Hot-Dog", "Hamburger"),
+                    "Slow food", List.of("Borsch", "Pasta")
             );
+            categoryRepository.deleteAll();
+            recipeRepository.deleteAll();
+            recipesPerCategory.forEach((categoryName, recipeNames) -> {
+                Category category = new Category(UUID.randomUUID().toString(), categoryName);
+                List<Recipe> recipes = recipeNames.stream()
+                        .map(name -> new Recipe(UUID.randomUUID().toString(), name, category))
+                        .collect(Collectors.toList());
+                recipeRepository.saveAll(recipes);
+                categoryRepository.save(category);
+            });
         };
     }
 }

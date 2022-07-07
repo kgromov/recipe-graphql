@@ -39,7 +39,7 @@ public class Recipe {
         this.id = id;
         this.description = description;
         this.categoryId = category.getId();
-        category.getRecipes().add(this);
+        category.getRecipeIds().add(this.getId());
     }
 
     public Recipe addIngredient(Ingredient ingredient){
