@@ -13,6 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -27,7 +28,7 @@ public class RecipeController {
     private final RecipeRepository recipeRepository;
     private final CategoryRepository categoryRepository;
 
-    @QueryMapping("recipe")
+/*    @QueryMapping("recipe")
 //    @SchemaMapping(typeName = "Query", field = "recipe")
     public Mono<RecipeDto> recipe(@Argument String id) {
         return recipeRepository.findById(id).map(RecipeDto::new);
@@ -36,34 +37,50 @@ public class RecipeController {
     @QueryMapping("recipes")
     public Flux<Recipe> recipes() {
         return recipeRepository.findAll();
-    }
+    }*/
 
     @QueryMapping("categories")
     public Flux<Category> categories() {
         return categoryRepository.findAll();
     }
 
-    @SchemaMapping(typeName = "Category")
-    public Flux<Recipe> recipes(@Argument Category category) {
+    @QueryMapping("category")
+    public Mono<Category> category(@Argument String id) {
+        return categoryRepository.findById(id);
+    }
+
+   /* @SchemaMapping(typeName = "Category")
+    public Flux<Recipe> recipes(Category category) {
         log.info("Fetching recipes for category {}", category);
         return categoryRepository.findById(category.getId())
                 .flatMapIterable(Category::getRecipes);
-    }
-
-   /* @BatchMapping
-    Map<Recipe, Category> category(Flux<Recipe> recipes) {
-        log.info("Reactive batching");
-        return StreamSupport.stream(recipes.toIterable().spliterator(), false)
-                .collect(Collectors.toMap(identity(), Recipe::getCategory));
     }*/
 
-//    @BatchMapping
-//    Flux<Tuple2<Recipe, Category>> category(Flux<Recipe> recipes) {
-//        log.info("Reactive batching");
-//        Flux<Category> categoryFlux = recipes.flatMap(recipe -> Mono.just(recipe.getCategory());
-//        return recipes.zipWith(categoryFlux);
-//    }
+    @BatchMapping(typeName = "Category")
+    public Map<Category, Iterable<Recipe>> recipes(Collection<Category> categories) {
+        log.info("Batching recipes for categories {}", categories);
+        return categories.stream()
+                .collect(Collectors.toMap(identity(),
+                        Category::getRecipes)
+                );
+    }
 
+   /* @BatchMapping(typeName = "Category")
+    public Map<Category, Flux<Recipe>> recipes(Flux<Category> categories) {
+        log.info("Reactive batching");
+        return StreamSupport.stream(categories.toIterable().spliterator(), false)
+                .collect(Collectors.toMap(identity(),
+                        category -> recipeRepository.findByCategoryId(category.getId()))
+                );
+    }*/
+
+    /* @BatchMapping(typeName = "Category")
+     public Flux<Tuple2<Category, Recipe>> recipes(Flux<Category> categories) {
+         log.info("Reactive batching");
+         Flux<Recipe> recipeFlux = categories.flatMap(category -> Flux.fromIterable(category.getRecipes()));
+         return categories.zipWith(recipeFlux);
+     }
+ */
     @MutationMapping("addRecipe")
     public Mono<Recipe> addRecipe(@Argument String description) {
         return recipeRepository.save(new Recipe(UUID.randomUUID().toString(), description));
