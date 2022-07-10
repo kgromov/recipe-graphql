@@ -49,13 +49,14 @@ public class RecipeController {
         return categoryRepository.findById(id);
     }
 
-   /* @SchemaMapping(typeName = "Category")
-    public Flux<Recipe> recipes(Category category) {
-        log.info("Fetching recipes for category {}", category);
-        return categoryRepository.findById(category.getId())
-                .flatMapIterable(Category::getRecipes);
-    }*/
-
+    /*
+     * Possible values:
+     * 1) Map<K, V> - A map with parent objects as keys, and batch loaded objects as values.
+     * 2) Mono<Map<K, V>> - the same in reactive style
+     * 3) Flux<V> - the same sequence as sources passed to the method as argument
+     * 4) Callable<Map<K,V>>, Callable<Collection<V>> - Imperative variants, e.g. without remote calls to make. ?
+     * 5) Callable<Map<K,V>>, Callable<Collection<V>> - For this to work, AnnotatedControllerConfigurer must be configured with an Executor
+     */
     @BatchMapping(typeName = "Category")
     public Map<Category, Iterable<Recipe>> recipes(Collection<Category> categories) {
         log.info("Batching recipes for categories {}", categories);
@@ -65,22 +66,6 @@ public class RecipeController {
                 );
     }
 
-   /* @BatchMapping(typeName = "Category")
-    public Map<Category, Flux<Recipe>> recipes(Flux<Category> categories) {
-        log.info("Reactive batching");
-        return StreamSupport.stream(categories.toIterable().spliterator(), false)
-                .collect(Collectors.toMap(identity(),
-                        category -> recipeRepository.findByCategoryId(category.getId()))
-                );
-    }*/
-
-    /* @BatchMapping(typeName = "Category")
-     public Flux<Tuple2<Category, Recipe>> recipes(Flux<Category> categories) {
-         log.info("Reactive batching");
-         Flux<Recipe> recipeFlux = categories.flatMap(category -> Flux.fromIterable(category.getRecipes()));
-         return categories.zipWith(recipeFlux);
-     }
- */
     @MutationMapping("addRecipe")
     public Mono<Recipe> addRecipe(@Argument String description) {
         return recipeRepository.save(new Recipe(UUID.randomUUID().toString(), description));
