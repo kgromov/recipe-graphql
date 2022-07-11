@@ -1,7 +1,0 @@
-#query {
-#    categories($id: ID!){
-#        category(id: $id){
-#            name
-#        }
-#    }
-#}

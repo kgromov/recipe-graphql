@@ -49,6 +49,11 @@ public class RecipeController {
         return categoryRepository.findById(id);
     }
 
+    @QueryMapping("categoryByName")
+    public Mono<Category> categoryByName(@Argument String name) {
+        return categoryRepository.findByName(name);
+    }
+
     /*
      * Possible values:
      * 1) Map<K, V> - A map with parent objects as keys, and batch loaded objects as values.
