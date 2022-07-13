@@ -5,17 +5,17 @@ import com.graphql.domain.Recipe;
 import com.graphql.domain.dtos.RecipeDto;
 import com.graphql.repositories.CategoryRepository;
 import com.graphql.repositories.RecipeRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.*;
+import org.springframework.graphql.execution.BatchLoaderRegistry;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -23,21 +23,31 @@ import static java.util.function.Function.identity;
 
 @Slf4j
 @Controller
-@RequiredArgsConstructor
 public class RecipeController {
     private final RecipeRepository recipeRepository;
     private final CategoryRepository categoryRepository;
 
-/*    @QueryMapping("recipe")
+    public RecipeController(RecipeRepository recipeRepository,
+                            CategoryRepository categoryRepository,
+                            BatchLoaderRegistry registry) {
+        this.recipeRepository = recipeRepository;
+        this.categoryRepository = categoryRepository;
+        registry.forTypePair(String.class, Category.class).registerMappedBatchLoader((categoryIds, env) -> {
+            // return Map<String, Category>
+            return categoryRepository.findAllById(categoryIds).collectMap(Category::getId, Function.identity());
+        });
+    }
+
+    @QueryMapping("recipe")
 //    @SchemaMapping(typeName = "Query", field = "recipe")
-    public Mono<RecipeDto> recipe(@Argument String id) {
-        return recipeRepository.findById(id).map(RecipeDto::new);
+    public Mono<Recipe> recipe(@Argument String id) {
+        return recipeRepository.findById(id);
     }
 
     @QueryMapping("recipes")
     public Flux<Recipe> recipes() {
         return recipeRepository.findAll();
-    }*/
+    }
 
     @QueryMapping("categories")
     public Flux<Category> categories() {

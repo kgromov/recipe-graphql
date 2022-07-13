@@ -1,9 +1,10 @@
 type Query {
-#    recipe(id: ID): Recipe
-#    recipes: [Recipe]
     category(id: ID): Category
     categoryByName(name: String): Category
     categories: [Category]
+
+    recipe(id: ID): Recipe
+    recipes: [Recipe]
 }
 
 type Mutation {

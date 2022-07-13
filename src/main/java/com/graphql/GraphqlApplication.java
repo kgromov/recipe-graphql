@@ -40,13 +40,35 @@ public class GraphqlApplication {
                                                            RecipeRepository recipeRepository) {
         return builder -> {
             builder.type("Query",
-                    wiring -> wiring.dataFetcher("recipes", env -> recipeRepository.findAll())
+                    wiring -> wiring
+                            .dataFetcher("categories", env -> categoryRepository.findAll())
+                            .dataFetcher("category", env -> {
+                                String categoryId = env.getArgument("id");
+                                return categoryRepository.findById(categoryId);
+                            })
             );
 
-            builder.type("Category",  wiring -> wiring.dataFetcher(
+            builder.type("Query",
+                    wiring -> wiring
+                            .dataFetcher("recipes", env -> recipeRepository.findAll())
+                            .dataFetcher("recipe", env ->
+                            {
+                                String recipeId = env.getArgument("id");
+                                return recipeRepository.findById(recipeId);
+                            })
+            );
+
+            builder.type("Category", wiring -> wiring.dataFetcher(
                     "recipes", env -> {
                         Category category = env.getSource();
                         return recipeRepository.findByCategoryId(category.getId());
+                    }
+            ));
+            // In order to return category inside recipe
+            builder.type("Recipe", wiring -> wiring.dataFetcher(
+                    "category", env -> {
+                        Recipe recipe = env.getSource();
+                        return categoryRepository.findById(recipe.getCategoryId());
                     }
             ));
         };
