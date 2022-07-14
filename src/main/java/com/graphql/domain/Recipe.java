@@ -1,13 +1,13 @@
 package com.graphql.domain;
 
-import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
-@Document
+@Entity
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"id"})
@@ -21,7 +21,6 @@ public class Recipe {
     private String source;
     private String url;
     private String notes;
-    private Set<Ingredient> ingredients = new HashSet<>();
     private Byte[] image;
     private Difficulty difficulty;
     private String categoryId;
@@ -39,11 +38,6 @@ public class Recipe {
         this.id = id;
         this.description = description;
         this.categoryId = category.getId();
-        category.getRecipeIds().add(this.getId());
-    }
-
-    public Recipe addIngredient(Ingredient ingredient){
-        this.ingredients.add(ingredient);
-        return this;
+        category.getRecipes().add(this);
     }
 }

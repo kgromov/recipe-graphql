@@ -1,17 +1,17 @@
 package com.graphql.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-@Document
+@Entity
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"id"})
@@ -19,7 +19,8 @@ public class Category {
     @Id
     private String id;
     private String name;
-    private List<String> recipeIds = new ArrayList<>();
+    @OneToMany()
+    private List<Recipe> recipes = new ArrayList<>();
 
     public Category(String id, String name) {
         this.id = id;
@@ -27,6 +28,6 @@ public class Category {
     }
 
     public void addRecipe(Recipe recipe) {
-        recipeIds.add(recipe.getId());
+        recipes.add(recipe);
     }
 }

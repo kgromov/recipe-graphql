@@ -1,6 +1,16 @@
 type Query {
     category(id: ID): Category
+    categoryByName(name: String): Category
     categories: [Category]
+
+    recipe(id: ID): Recipe
+    recipes: [Recipe]
+}
+
+type Mutation {
+    addRecipe(description: String): Recipe
+    addRecipeWithPayload(recipeDto: RecipeDto): Recipe
+    addCategory(name: String): Category
 }
 
 type Category {
@@ -22,8 +32,18 @@ type Recipe {
     category: Category
 }
 
+input RecipeDto {
+    description: String!,
+    prepTime: Int,
+    cookTime: Int,
+    servings: Int,
+    source: String,
+    url: String,
+    notes: String,
+    difficulty: Difficulty,
+    categoryId: String
+}
+
 enum Difficulty {
     EASY, MODERATE, KIND_OF_HARD, HARD
 }
-
-

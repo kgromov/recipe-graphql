@@ -2,34 +2,23 @@ package com.graphql;
 
 import com.graphql.domain.Category;
 import com.graphql.domain.Recipe;
-import com.graphql.domain.dtos.RecipeDto;
 import com.graphql.repositories.CategoryRepository;
 import com.graphql.repositories.RecipeRepository;
-import graphql.schema.DataFetcher;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
-import org.springframework.graphql.client.HttpGraphQlClient;
-import org.springframework.graphql.client.RSocketGraphQlClient;
-import org.springframework.graphql.data.query.QuerydslDataFetcher;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.util.*;
-import java.util.function.Function;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
-@EnableMongoRepositories
+@EnableJpaRepositories
 @SpringBootApplication
 public class GraphqlApplication {
 
@@ -47,6 +36,16 @@ public class GraphqlApplication {
                             .dataFetcher("category", env -> {
                                 String categoryId = env.getArgument("id");
                                 return categoryRepository.findById(categoryId);
+                            })
+            );
+
+            builder.type("Query",
+                    wiring -> wiring
+                            .dataFetcher("recipes", env -> recipeRepository.findAll())
+                            .dataFetcher("recipe", env ->
+                            {
+                                String recipeId = env.getArgument("id");
+                                return recipeRepository.findById(recipeId);
                             })
             );
 
