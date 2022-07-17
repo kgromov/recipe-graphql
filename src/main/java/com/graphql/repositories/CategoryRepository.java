@@ -6,4 +6,7 @@ import reactor.core.publisher.Mono;
 
 public interface CategoryRepository extends ReactiveMongoRepository<Category, String> {
     Mono<Category> findByName(String name);
+
+    @Override
+    Mono<Category> findById(String id);
 }
