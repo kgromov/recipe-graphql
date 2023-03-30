@@ -5,6 +5,7 @@ import com.graphql.domain.Recipe;
 import com.graphql.domain.dtos.RecipeDto;
 import com.graphql.repositories.CategoryRepository;
 import com.graphql.repositories.RecipeRepository;
+import graphql.schema.DataFetchingEnvironment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
@@ -50,6 +51,11 @@ public class RecipeController {
     public Collection<Recipe> recipes() {
         return recipeRepository.findAll();
     }
+
+//    @QueryMapping("recipes")
+//    public Collection<Recipe> recipes(DataFetchingEnvironment environment) {
+//        return recipeRepository.findAll();
+//    }
 
     @QueryMapping("categories")
     public Collection<Category> categories() {
